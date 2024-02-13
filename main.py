@@ -3,9 +3,9 @@ import requests
 from post import Post
 
 app = Flask(__name__)
-response = requests.get('https://api.npoint.io/c790b4d5cab58020d391')
+response = requests.get('https://api.npoint.io/674f5423f73deab1e9a7')
 all_posts = response.json()
-posts = [Post(post['id'], post['title'], post['subtitle'], post['body']) for post in all_posts]
+posts = [Post(post['id'], post['title'], post['subtitle'], post['body'], post['image_url']) for post in all_posts]
 
 @app.route('/')
 def home():
