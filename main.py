@@ -11,5 +11,9 @@ posts = [Post(post['id'], post['title'], post['subtitle'], post['body']) for pos
 def home():
     return render_template("index.html", posts=posts)
 
+@app.route('/post/<int:id>')
+def show_post(id):
+    return render_template('post.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
