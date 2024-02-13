@@ -13,7 +13,11 @@ def home():
 
 @app.route('/post/<int:id>')
 def show_post(id):
-    return render_template('post.html')
+    requested_post = None
+    for post in posts:
+        if post.id == id:
+            requested_post = post
+    return render_template('post.html', post=requested_post)
 
 if __name__ == "__main__":
     app.run(debug=True)
