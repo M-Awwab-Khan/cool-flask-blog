@@ -30,9 +30,9 @@ def contact():
         print(request.form['email'])
         print(request.form['phone'])
         print(request.form['message'])
-        return '<h1>Successfully sent your message</h1>'
+        return render_template('contact.html', msg_sent = True)
     else:
-        return render_template('contact.html')
+        return render_template('contact.html',  msg_sent = False)
 
 
 if __name__ == "__main__":
