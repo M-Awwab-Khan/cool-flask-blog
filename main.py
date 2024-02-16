@@ -11,12 +11,18 @@ from datetime import date
 import smtplib
 import os
 
+# GMAIL CREDENTIALS
 GMAIL_USER = 'mawwabkhank2006@gmail.com'
 GMAIL_PASSWORD = os.getenv('GMAIL_PASSWORD')
 
+# APP CONFIG
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+
+# CKEDITOR CONFIG
+ckeditor = CKEditor()
+ckeditor.init_app(app)
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -36,6 +42,14 @@ class BlogPost(db.Model):
     author: Mapped[str] = mapped_column(String(250), nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
+# ADD POST FORM
+class BlogPostForm(FlaskForm):
+    title = StringField('Blog Title', validators=[DataRequired()])
+    subtitle = StringField('Subtitle', validators=[DataRequired()])
+    author = StringField('Your name', validators=[DataRequired()])
+    bg_url = StringField('Background image link', validators=[URL()])
+    body = CKEditorField('Post Content', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 with app.app_context():
     db.create_all()
