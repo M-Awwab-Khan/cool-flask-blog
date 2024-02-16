@@ -17,9 +17,9 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
                     <!-- Post preview-->
-                    {% for post in posts %}
+                    {% for post in all_posts %}
                     <div class="post-preview">
-                        <a href="{{ url_for('show_post', id=post.id) }}">
+                        <a href="{{ url_for('show_post', post_id=post.id) }}">
                             <h2 class="post-title">{{ post.title }}</h2>
                             <h3 class="post-subtitle">{{ post.subtitle }}</h3>
                         </a>
