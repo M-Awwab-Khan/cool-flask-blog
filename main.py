@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -41,16 +41,17 @@ with app.app_context():
     db.create_all()
 
 @app.route('/')
-def home():
-    return render_template("index.html", posts=posts)
+def get_all_posts():
+    # TODO: Query the database for all the posts. Convert the data to a python list.
+    posts = []
+    return render_template("index.html", all_posts=posts)
 
-@app.route('/post/<int:id>')
-def show_post(id):
-    requested_post = None
-    for post in posts:
-        if post.id == id:
-            requested_post = post
-    return render_template('post.html', post=requested_post)
+# TODO: Add a route so that you can click on individual posts.
+@app.route('/post/<int:post_id>')
+def show_post(post_id):
+    # TODO: Retrieve a BlogPost from the database based on the post_id
+    requested_post = "Grab the post from your database"
+    return render_template("post.html", post=requested_post)
 
 @app.route('/about')
 def about():
