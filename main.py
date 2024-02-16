@@ -65,6 +65,12 @@ def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
     return render_template("post.html", post=requested_post)
 
+@app.route('/add-post')
+def add_new_post():
+    form = BlogPostForm()
+    return render_template('make-post.html', form=form)
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
