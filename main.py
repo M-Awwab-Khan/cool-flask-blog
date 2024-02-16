@@ -65,7 +65,7 @@ def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
     return render_template("post.html", post=requested_post)
 
-@app.route('/add-post', methods=['POST'])
+@app.route('/add-post', methods=['GET', 'POST'])
 def add_new_post():
     form = BlogPostForm()
     if form.validate_on_submit():
@@ -80,7 +80,19 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect('/')
-    return render_template('make-post.html', form=form)
+    return render_template('make-post.html', form=form, purpose='new')
+
+@app.route('/edit-post/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    post = db.session.execute(db.select(BlogPost).where(BlogPost.id==post_id)).scalar()
+    form = BlogPostForm(
+        title=post.title,
+        subtitle=post.subtitle,
+        author=post.author,
+        bg_url=post.img_url,
+        body=post.body
+    )
+    return render_template('make-post.html', form=form, purpose='edit')
 
 
 @app.route('/about')
