@@ -32,12 +32,11 @@
         <div class="my-5">
           <!-- * * * * * * * * * * * * * * *-->
           <!-- * * Simplified SB Contact Form for the Tutorial* *-->
-          <!-- TODO: add an "action" and a "method" to link this form to your main.py -->
           <form
             id="contactForm"
             name="sentMessage"
-            action="/contact",
-            method="POST"
+            action="{{ url_for('contact') }}"
+            method="post"
           >
             <div class="form-floating">
               <input
@@ -85,11 +84,11 @@
             </div>
             <br />
             <button
-              class="btn btn-primary text-uppercase"
+              class="btn btn-danger text-uppercase"
               id="submitButton"
               type="submit"
             >
-              Send
+              NOT USED in Day 67
             </button>
           </form>
         </div>
