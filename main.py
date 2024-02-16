@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL
 from flask_ckeditor import CKEditor, CKEditorField
-from datetime import date
+import datetime
 import smtplib
 import os
 
@@ -65,9 +65,21 @@ def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
     return render_template("post.html", post=requested_post)
 
-@app.route('/add-post')
+@app.route('/add-post', methods=['POST'])
 def add_new_post():
     form = BlogPostForm()
+    if form.validate_on_submit():
+        new_post = BlogPost(
+            title= form.title.data,
+            subtitle= form.subtitle.data,
+            author= form.author.data,
+            date = datetime.datetime.now().strftime("%B %d, %Y"),
+            img_url= form.bg_url.data,
+            body= form.body.data
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect('/')
     return render_template('make-post.html', form=form)
 
 
