@@ -5,7 +5,7 @@ from flask_gravatar import Gravatar
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, ForeignKey
+from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -30,7 +30,7 @@ ckeditor.init_app(app)
 # CREATE DATABASE
 class Base(DeclarativeBase):
     pass
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -60,6 +60,7 @@ class User(UserMixin, db.Model):
     password: Mapped[str] = mapped_column(String(250), nullable=False)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
     posts = relationship("BlogPost", back_populates="author")
+    comments = relationship("Comment", back_populates="comment_author")
 
 # CONFIGURE TABLE
 class BlogPost(db.Model):
@@ -72,7 +73,17 @@ class BlogPost(db.Model):
     author = relationship("User", back_populates="posts")
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("registered_users.id"))
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
+    comments = relationship("Comment", back_populates="parent_post")
 
+# COMMENT TABLE
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    text: Mapped[str] = mapped_column(String(1000), nullable=False)
+    comment_author = relationship("User", back_populates="comments")
+    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("registered_users.id"))
+    post_id: Mapped[str] = mapped_column(Integer, db.ForeignKey("blog_posts.id"))
+    parent_post = relationship("BlogPost", back_populates="comments")
 
 with app.app_context():
     db.create_all()
@@ -131,8 +142,8 @@ def get_all_posts():
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
-    form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
+    form = CommentForm()
     return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form)
 
 @app.route("/new-post", methods=["GET", "POST"])
