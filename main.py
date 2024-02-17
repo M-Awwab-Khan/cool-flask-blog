@@ -102,7 +102,7 @@ def login():
             password = form.password.data
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('get_all_posts'), logged_in=current_user.is_authenticated)
+                return redirect(url_for('get_all_posts'))
         flash("Incorrect email or password")
         return redirect(url_for("login"))
     return render_template("login.html", form=form)
@@ -110,6 +110,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    logout_user()
     return redirect(url_for('get_all_posts'))
 
 @app.route('/')
