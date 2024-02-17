@@ -12,7 +12,7 @@ import datetime
 import smtplib
 import os
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 
 # GMAIL CREDENTIALS
 GMAIL_USER = 'mawwabkhank2006@gmail.com'
@@ -131,8 +131,9 @@ def get_all_posts():
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
+    form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
-    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user)
+    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form)
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
