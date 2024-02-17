@@ -59,6 +59,7 @@ class User(UserMixin, db.Model):
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(250), nullable=False)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
+    posts = relationship("BlogPost", back_populates="author")
 
 # CONFIGURE TABLE
 class BlogPost(db.Model):
@@ -68,7 +69,8 @@ class BlogPost(db.Model):
     subtitle: Mapped[str] = mapped_column(String(250), nullable=False)
     date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
-    author: Mapped[str] = mapped_column(String(250), nullable=False)
+    author = relationship("User", back_populates="posts")
+    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("registered_users.id"))
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
