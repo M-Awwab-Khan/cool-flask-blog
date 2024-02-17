@@ -140,11 +140,28 @@ def get_all_posts():
     posts = db.session.execute(db.select(BlogPost)).scalars().all()
     return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated, current_user=current_user)
 
-@app.route('/post/<int:post_id>')
+@app.route('/post/<int:post_id>', methods=['POST', 'GET'])
 def show_post(post_id):
-    requested_post = db.get_or_404(BlogPost, post_id)
     form = CommentForm()
-    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form)
+    requested_post = db.get_or_404(BlogPost, post_id)
+    post_comments = db.session.execute(db.select(Comment).where(Comment.post_id == post_id)).scalars().all()
+    if form.validate_on_submit():
+        if current_user.is_authenticated:
+            post = db.session.execute(db.select(BlogPost).where(BlogPost.id == post_id)).scalar()
+            new_comment = Comment(
+                text = form.comment_text.data,
+                comment_author = current_user,
+                author_id = current_user.id,
+                post_id = post_id,
+                parent_post = post
+            )
+            db.session.add(new_comment)
+            db.session.commit()
+            return redirect(url_for('show_post', post_id=post_id))
+        else:
+            flash("You need to log in to post a comment.")
+            return redirect(url_for('login'))
+    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form, comments=post_comments)
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
