@@ -42,8 +42,8 @@
         {{ ckeditor.config(name='comment_text') }}
         <!-- Create the wtf quick form from CommentForm -->
         {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-        {% if comments %}
-        {% for comment in comments %}
+        {% if post.comments %}
+        {% for comment in post.comments %}
         <div class="comment">
           <ul class="commentList">
             <li>
