@@ -75,7 +75,7 @@ def register():
         email = form.email.data
         if db.session.execute(db.select(User).where(User.email == email)).scalar():
             flash("This email is already associated with an account. Please log in instead.")
-            return render_template("register.html", form=form)
+            return redirect(url_for('login'))
         else:
             h_and_s_password = generate_password_hash(form.password.data, method="pbkdf2:sha256", salt_length=8)
             new_user = User(
