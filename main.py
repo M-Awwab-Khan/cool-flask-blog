@@ -145,6 +145,14 @@ def show_post(post_id):
     form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
     post_comments = db.session.execute(db.select(Comment).where(Comment.post_id == post_id)).scalars().all()
+    gravatar = Gravatar(app,
+                    size=100,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False,
+                    use_ssl=False,
+                    base_url=None)
     if form.validate_on_submit():
         if current_user.is_authenticated:
             post = db.session.execute(db.select(BlogPost).where(BlogPost.id == post_id)).scalar()
@@ -161,7 +169,7 @@ def show_post(post_id):
         else:
             flash("You need to log in to post a comment.")
             return redirect(url_for('login'))
-    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form, comments=post_comments)
+    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, current_user=current_user, form=form, comments=post_comments, gravatar=gravatar)
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
