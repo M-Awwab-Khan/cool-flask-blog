@@ -102,7 +102,7 @@ def login():
             password = form.password.data
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('get_all_posts'))
+                return redirect(url_for('get_all_posts'), logged_in=current_user.is_authenticated)
         flash("Incorrect email or password")
         return redirect(url_for("login"))
     return render_template("login.html", form=form)
@@ -115,13 +115,13 @@ def logout():
 @app.route('/')
 def get_all_posts():
     posts = db.session.execute(db.select(BlogPost)).scalars().all()
-    return render_template("index.html", all_posts=posts)
+    return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated)
 
 # TODO: Add a route so that you can click on individual posts.
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
-    return render_template("post.html", post=requested_post)
+    return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated)
 
 
 @app.route("/new-post", methods=["GET", "POST"])
@@ -139,7 +139,7 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form)
+    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
 
 
 # TODO: Use a decorator so only an admin user can edit a post
@@ -161,7 +161,7 @@ def edit_post(post_id):
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
-    return render_template("make-post.html", form=edit_form, is_edit=True)
+    return render_template("make-post.html", form=edit_form, is_edit=True, logged_in=current_user.is_authenticated)
 
 # TODO: Use a decorator so only an admin user can delete a post
 @app.route("/delete/<int:post_id>")
@@ -173,7 +173,7 @@ def delete_post(post_id):
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('about.html', logged_in=current_user.is_authenticated)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -190,9 +190,9 @@ def contact():
                 to_addrs=GMAIL_USER,
                 msg=msg
             )
-        return render_template('contact.html', msg_sent = True)
+        return render_template('contact.html', msg_sent = True, logged_in=current_user.is_authenticated)
     else:
-        return render_template('contact.html',  msg_sent = False)
+        return render_template('contact.html',  msg_sent = False, logged_in=current_user.is_authenticated)
 
 
 if __name__ == "__main__":
