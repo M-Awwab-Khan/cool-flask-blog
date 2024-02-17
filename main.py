@@ -34,6 +34,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
+# CONFIGURE FLASK LOGIN
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# LOAD USER
+@login_manager.user_loader
+def load_user(user_id):
+    return db.get_or_404(User, user_id)
+
 
 # CONFIGURE TABLE
 class BlogPost(db.Model):
@@ -47,7 +56,7 @@ class BlogPost(db.Model):
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 # TODO: Create a User table for all your registered users. 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "registered_users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
@@ -59,9 +68,26 @@ with app.app_context():
     db.create_all()
 
 # TODO: Use Werkzeug to hash the user's password when creating a new user.
-@app.route('/register')
+@app.route('/register', methods=['POST', 'GET'])
 def register():
     form = RegisterForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        if db.session.execute(db.select(User).where(User.email == email)).scalar():
+            flash("This email is already associated with an account. Please log in instead.")
+            return render_template("register.html", form=form)
+        else:
+            h_and_s_password = generate_password_hash(form.password.data, method="pbkdf2:sha256", salt_length=8)
+            new_user = User(
+                email = form.email.data,
+                password = h_and_s_password,
+                name = form.name.data
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            return redirect(url_for('get_all_posts'))
+        
     return render_template("register.html", form = form)
 
 
