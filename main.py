@@ -12,7 +12,7 @@ import datetime
 import smtplib
 import os
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm
+from forms import CreatePostForm, RegisterForm, LoginForm
 
 # GMAIL CREDENTIALS
 GMAIL_USER = 'mawwabkhank2006@gmail.com'
@@ -92,9 +92,20 @@ def register():
 
 
 # TODO: Retrieve a user from the database based on their email. 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    return render_template("login.html")
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = db.session.execute(db.select(User).where(User.email == email)).scalar()
+        if user:
+            password = form.password.data
+            if check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(url_for('get_all_posts'))
+        flash("Incorrect email or password")
+        return redirect(url_for("login"))
+    return render_template("login.html", form=form)
 
 
 @app.route('/logout')
